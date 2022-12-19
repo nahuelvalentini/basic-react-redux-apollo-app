@@ -1,21 +1,32 @@
-import React from 'react'
-import { gql } from '../../__generated__';
-import { BasicChartTexts } from './BasicChart.texts';
+import React, { useEffect, useState } from 'react'
+import * as Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+import moment from 'moment'
+import { QueryTestQuery } from '../../__generated__/graphql';
+import { initialStateBasicChart } from './BasicChart.localData';
 
-const QUERY_TEST_GENERATED_TYPES = gql(`
-  query queryTest {
-    sales {
-      date
-      price
-      productId
-    } 
-  }
-`);
+const returnArrayDatesFormated = (sale: (NonNullable<QueryTestQuery['sales']>[0])) => {
+  return moment(new Date(sale?.date)).format('DD-MM-YYYY');
+};
 
-const BasicChartComponent = () => {
+const BasicChartComponent = (
+  { data, ...props}: HighchartsReact.Props & { data?: QueryTestQuery }) => {
+
+  const chartComponentRef = React.useRef<HighchartsReact.RefObject>(null);
+  const [optionsHichart, setOptionsHichart] = useState(initialStateBasicChart);
+
+  useEffect(() => {
+    const salesDates = data?.sales?.map(returnArrayDatesFormated);
+    const xAxis = { categories: salesDates }
+    setOptionsHichart({...optionsHichart, xAxis })
+  }, [data]);
   return (
-    <h2>{BasicChartTexts.get('firstTitle')}</h2>
-  );
-}
+    <HighchartsReact
+      highcharts={Highcharts}
+      options={optionsHichart}
+      ref={chartComponentRef}
+      {...props}/>
+    );
+};
 
 export default BasicChartComponent;

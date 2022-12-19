@@ -1,15 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
 import App from './App';
 import { AppTexts } from './App.texts';
+import Global from './layouts/Global/Global.layout';
 
 it('renders Basic React Redux Apollo App', () => {
   render(
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <Global>
+      {App}
+    </Global>
   );
 
   expect(screen.getByText(AppTexts.get('titleApp'))).toBeInTheDocument();
